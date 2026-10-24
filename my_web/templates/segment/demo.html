@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Segment Tree · демо{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>Сумма <code>total</code> на диапазоне</h1>
+    <p class="lead">
+        Двигай слайдеры <code>l</code> и <code>r</code> — сервер посчитает сумму
+        <code>total</code> за этот диапазон через дерево отрезков и через naive,
+        и покажет оба времени. Ниже можно обновить одно значение.
+    </p>
+
+    <div class="form-row">
+        <div class="form-field" style="flex: 1; min-width: 240px;">
+            <label for="range-l">l = <span id="label-l">0</span></label>
+            <input type="range" id="range-l" min="0" max="119999" value="0" step="1">
+        </div>
+        <div class="form-field" style="flex: 1; min-width: 240px;">
+            <label for="range-r">r = <span id="label-r">999</span></label>
+            <input type="range" id="range-r" min="0" max="119999" value="999" step="1">
+        </div>
+        <button type="button" class="btn" id="query-run">Посчитать</button>
+    </div>
+
+    <div id="query-error" class="error hidden"></div>
+    <div id="query-result" class="result hidden"></div>
+</section>
+
+<section class="section">
+    <h2>Обновить одно значение</h2>
+    <p class="muted">
+        Меняет <code>total</code> у заказа с позицией <code>pos</code>.
+        Дерево обновляется за O(log n), и это видно по времени.
+    </p>
+    <form id="update-form" class="form-row">
+        <div class="form-field">
+            <label for="update-pos">pos (0..119999)</label>
+            <input type="number" id="update-pos" min="0" max="119999" value="0" required>
+        </div>
+        <div class="form-field">
+            <label for="update-value">new total</label>
+            <input type="number" id="update-value" min="0" step="0.01" value="1000.00" required>
+        </div>
+        <button type="submit" class="btn secondary" id="update-submit">Обновить</button>
+    </form>
+        <div class="form-row" style="margin-top: 12px;">
+        <button type="button" class="btn secondary" id="reset-btn">
+            Сбросить pos к исходному значению
+        </button>
+    </div>
+    <div id="update-error" class="error hidden"></div>
+    <div id="update-result" class="result hidden"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/segment_demo.js') }}"></script>
+{% endblock %}

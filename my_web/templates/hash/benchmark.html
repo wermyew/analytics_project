@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Hash Map · бенчмарк{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>Замеры: Hash Map vs Linear Search</h1>
+    <p class="lead">
+        Замеряем время поиска по <code>order_id</code> двумя способами:
+        перебором всего списка (linear search) и через хеш-таблицу.
+        Запросы равномерно распределены по всему датасету.
+    </p>
+
+    <div class="form-row">
+        <div class="form-field">
+            <label for="n-queries">Количество запросов</label>
+            <input type="number" id="n-queries" min="1" max="100" value="30">
+        </div>
+        <button type="button" class="btn" id="bench-run">Запустить</button>
+    </div>
+
+    <div id="bench-error" class="error hidden"></div>
+    <div id="bench-result" class="result hidden"></div>
+</section>
+
+<section class="section">
+    <h2>Что покажет результат</h2>
+    <ul>
+        <li><strong>Linear search</strong> — O(n) на каждый запрос.
+            При 30 запросах и 120 000 строках это ~3.6 млн сравнений.</li>
+        <li><strong>Hash lookup</strong> — O(1) в среднем.
+            Практически мгновенно на каждый запрос.</li>
+        <li><strong>Ускорение</strong> — во сколько раз hash быстрее linear
+            на этом датасете. Ожидаемо сотни-тысячи раз.</li>
+    </ul>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const runBtn = document.getElementById("bench-run");
+const nInput = document.getElementById("n-queries");
+const resultBox = document.getElementById("bench-result");
+const errorBox = document.getElementById("bench-error");
+
+function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.classList.remove("hidden");
+    resultBox.classList.add("hidden");
+}
+
+runBtn.addEventListener("click", async () => {
+    errorBox.classList.add("hidden");
+    runBtn.disabled = true;
+    runBtn.innerHTML = `<span class="spinner"></span>Считаю…`;
+    try {
+        const n = parseInt(nInput.value, 10) || 30;
+        const resp = await fetch(`/api/hash/benchmark?n_queries=${n}`);
+        if (!resp.ok) {
+            const body = await resp.json().catch(() => ({}));
+            throw new Error(body.detail || `HTTP ${resp.status}`);
+        }
+        const data = await resp.json();
+        resultBox.classList.remove("hidden");
+        resultBox.innerHTML = `
+            <dl class="kv">
+                <dt>Запросов</dt><dd>${data.n_queries}</dd>
+                <dt>Linear search</dt><dd>${data.linear_ms.toFixed(1)} ms</dd>
+                <dt>Hash lookup</dt><dd>${data.hash_ms.toFixed(3)} ms</dd>
+            </dl>
+            <div class="metric-row">
+                <div class="metric">
+                    <span class="metric-label">Ускорение</span>
+                    <span class="metric-value">${data.speedup ? data.speedup.toFixed(1) + "×" : "—"}</span>
+                </div>
+            </div>
+        `;
+    } catch (e) {
+        showError("Ошибка: " + e.message);
+    } finally {
+        runBtn.disabled = false;
+        runBtn.textContent = "Запустить";
+    }
+});
+</script>
+{% endblock %}

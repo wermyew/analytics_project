@@ -1,0 +1,66 @@
+    ds_learning_site/
+│
+├── main.py
+├── config.py
+├── requirements.txt
+├── README.md
+├── pytest.ini
+│
+├── data/
+│   └── marketplace_orders_2024_2026.csv
+│
+├── core/
+│   ├── __init__.py
+│   ├── hash_map.py
+│   ├── segment_tree.py
+│   ├── naive.py
+│   └── dataset_loader.py
+│
+├── services/
+│   ├── __init__.py
+│   ├── state.py
+│   ├── hash_service.py
+│   ├── segment_service.py
+│   └── benchmark_service.py
+│
+├── api/
+│   ├── __init__.py
+│   ├── hash_api.py
+│   ├── schemas.py
+│   ├── segment_api.py
+│   └── dataset_api.py
+│
+├── pages/
+│   ├── __init__.py
+│   ├── main_pages.py
+│   ├── hash_pages.py
+│   ├── templates.py
+│   └── segment_pages.py
+│
+├── templates/
+│   ├── base.html
+│   ├── about.html
+│   ├── index.html
+│   ├── hash/
+│   │   ├── theory.html
+│   │   ├── demo.html
+│   │   └── benchmark.html
+│   ├── segment/
+│   │   ├── theory.html
+│   │   ├── demo.html
+│   │   └── benchmark.html
+│   └── compare.html
+│
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       ├── hash_demo.js
+│       └── segment_demo.js
+│
+└── tests/
+    ├── __init__.py
+    ├── conftest.py
+    ├── test_hash_map.py
+    ├── test_segment_tree.py
+    └── test_api.py

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ds_learning_site{% endblock %}</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="logo">ds_learning_site</a>
+        <nav class="site-nav">
+            <a href="/" class="{% if page == 'index' %}active{% endif %}">Главная</a>
+            <a href="/hash" class="{% if page and page.startswith('hash') %}active{% endif %}">Hash Map</a>
+            <a href="/segment" class="{% if page and page.startswith('segment') %}active{% endif %}">Segment Tree</a>
+            <a href="/compare" class="{% if page == 'compare' %}active{% endif %}">Сравнение</a>
+            <a href="/about" class="{% if page == 'about' %}active{% endif %}">О проекте</a>
+            <a href="/docs" target="_blank">API</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <span>Учебный проект · структуры данных на датасете заказов маркетплейса</span>
+        <span><a href="/docs" target="_blank">Swagger</a></span>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

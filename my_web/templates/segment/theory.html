@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Segment Tree · теория{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>Segment Tree (дерево отрезков)</h1>
+    <p class="lead">
+        Структура данных для быстрых запросов «сумма на отрезке»
+        с возможностью обновлять отдельные элементы.
+        В нашем случае — сумма <code>total</code> за диапазон заказов,
+        упорядоченных по <code>created_at</code>.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Как устроено</h2>
+    <ol>
+        <li>Массив значений <code>a[0..n-1]</code> (у нас — <code>total</code>, отсортированный по дате).</li>
+        <li>Дерево — массив <code>tree[1..4n]</code>. Каждый узел хранит <strong>сумму</strong> своего подотрезка.</li>
+        <li>Корень <code>tree[1]</code> — сумма всего массива.</li>
+        <li>Лист <code>tree[v]</code> — одно значение <code>a[i]</code>.</li>
+        <li>Внутренний узел = сумма двух детей: <code>tree[v] = tree[2v] + tree[2v+1]</code>.</li>
+    </ol>
+</section>
+
+<section class="section">
+    <h2>Сложности</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Операция</th>
+                <th>Naive</th>
+                <th>Segment Tree</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Построение</td><td>—</td><td>O(n)</td></tr>
+            <tr><td>Сумма на отрезке <code>[l, r]</code></td><td>O(r − l + 1)</td><td>O(log n)</td></tr>
+            <tr><td>Обновление <code>a[pos] = value</code></td><td>O(1)</td><td>O(log n)</td></tr>
+            <tr><td>Память</td><td>O(1)</td><td>O(4n)</td></tr>
+        </tbody>
+    </table>
+    <p class="muted">
+        Naive-сумма выигрывает на очень коротких диапазонах и на разовых запросах.
+        Segment Tree выигрывает при <strong>многих запросах и обновлениях</strong>:
+        O(log n) на каждую операцию вместо O(n).
+    </p>
+</section>
+
+<section class="section">
+    <h2>Что мы построили на датасете</h2>
+    <ul>
+        <li>Массив <code>total</code>, отсортированный по <code>created_at</code> (120 000 значений).</li>
+        <li>Дерево размером <code>4n = 480 000</code> узлов.</li>
+        <li><code>query(l, r)</code> — сумма <code>total</code> для заказов с <code>l</code>-го по <code>r</code>-й.</li>
+        <li><code>update(pos, value)</code> — меняет <code>total</code> одного заказа и пересчитывает предков.</li>
+        <li>Важно: <code>records</code>, <code>values</code> и <code>tree</code> всегда синхронны —
+            обновление идёт только через <code>SegmentTreeIndex.update</code>.</li>
+    </ul>
+</section>
+
+<section class="section">
+    <a class="btn" href="/segment/demo">Попробовать запросы →</a>
+    <a class="btn secondary" href="/segment/benchmark">Замеры →</a>
+</section>
+{% endblock %}

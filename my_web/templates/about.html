@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}О проекте · ds_learning_site{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>О проекте</h1>
+    <p>
+        <strong>ds</strong> = <strong>d</strong>ata <strong>s</strong>tructures
+        (не Data Science). Учебный сайт-визуализатор структур данных
+        на синтетическом датасете заказов маркетплейса.
+    </p>
+    <h2>Что внутри</h2>
+    <ul>
+        <li><strong>Hash Map</strong> — хеш-таблица с разрешением коллизий методом цепочек.
+            Ключ — <code>order_id</code>, значение — номер строки в датафрейме.</li>
+        <li><strong>Segment Tree</strong> — дерево отрезков над массивом
+            <code>total</code>, упорядоченным по <code>created_at</code>.
+            Поддерживает query и update за O(log n).</li>
+    </ul>
+    <h2>Стек</h2>
+    <p>
+        FastAPI + Jinja2 + pandas/numpy. Индексы строятся один раз при старте
+        и живут в памяти всё время работы сервера.
+    </p>
+    <h2>Структура кода</h2>
+    <ul>
+        <li><code>core/</code> — чистые структуры данных, без знания про веб</li>
+        <li><code>services/</code> — состояние и мост между core и api</li>
+        <li><code>api/</code> — JSON-эндпоинты</li>
+        <li><code>pages/</code> — HTML-роуты</li>
+    </ul>
+</section>
+{% endblock %}

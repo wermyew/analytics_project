@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Hash Map · демо{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>Поиск заказа по <code>order_id</code></h1>
+    <p class="lead">
+        Введи <code>order_id</code> — сервер найдёт строку через хеш-таблицу
+        и параллельно через линейный поиск, чтобы сравнить время.
+    </p>
+
+    <form id="hash-form" class="form-row">
+        <div class="form-field">
+            <label for="order-id">order_id</label>
+            <input
+                type="number"
+                id="order-id"
+                name="order_id"
+                min="1"
+                max="120000"
+                value="60001"
+                required
+            >
+        </div>
+        <button type="submit" class="btn" id="hash-submit">Найти</button>
+        <button type="button" class="btn secondary" id="hash-random">Случайный</button>
+    </form>
+
+    <div id="hash-error" class="error hidden"></div>
+    <div id="hash-result" class="result hidden"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/hash_demo.js') }}"></script>
+{% endblock %}

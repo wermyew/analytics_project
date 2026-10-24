@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Главная · ds_learning_site{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Структуры данных на реальных данных</h1>
+    <p class="lead">
+        Учебный сайт-визуализатор: хеш-таблица и дерево отрезков
+        на синтетическом датасете заказов маркетплейса.
+        Все цифры ниже — из живого датасета, который загружен в память сервера.
+    </p>
+</section>
+
+<section class="grid">
+    <div class="card">
+        <div class="card-label">Строк в датасете</div>
+        <div class="card-value">{{ "{:,}".format(rows).replace(",", " ") }}</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Период</div>
+        <div class="card-value small">{{ date_from }} → {{ date_to }}</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Сумма total</div>
+        <div class="card-value">{{ "{:,.2f}".format(total_sum).replace(",", " ") }}</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Уникальный ключ</div>
+        <div class="card-value small"><code>{{ unique_field }}</code></div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Что уже построено</h2>
+    <div class="grid">
+        <div class="card">
+            <div class="card-label">Hash Map</div>
+            <div class="card-value small">
+                capacity = {{ hash_capacity }}<br>
+                build = {{ "%.1f"|format(hash_build_ms) }} ms
+            </div>
+            <p class="card-note">
+                Поиск по <code>{{ unique_field }}</code> за O(1) в среднем.
+            </p>
+            <a class="btn" href="/hash/demo">Попробовать →</a>
+        </div>
+        <div class="card">
+            <div class="card-label">Segment Tree</div>
+            <div class="card-value small">
+                n = {{ "{:,}".format(segment_n).replace(",", " ") }}<br>
+                build = {{ "%.1f"|format(segment_build_ms) }} ms
+            </div>
+            <p class="card-note">
+                Сумма <code>{{ value_field }}</code> по диапазону
+                <code>{{ order_field }}</code> за O(log n).
+            </p>
+            <a class="btn" href="/segment/demo">Попробовать →</a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Зачем это нужно</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Задача</th>
+                <th>Без структуры</th>
+                <th>Со структурой</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Найти заказ по <code>{{ unique_field }}</code></td>
+                <td>O(n) — линейный перебор</td>
+                <td>O(1) — Hash Map</td>
+            </tr>
+            <tr>
+                <td>Сумма <code>{{ value_field }}</code> за период</td>
+                <td>O(n) — сумма по срезу</td>
+                <td>O(log n) — Segment Tree</td>
+            </tr>
+            <tr>
+                <td>Изменить сумму одного заказа</td>
+                <td>O(1) — просто заменить</td>
+                <td>O(log n) — обновить дерево</td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="muted">
+        Подробные замеры — на страницах
+        <a href="/hash/benchmark">Hash Map benchmark</a>
+        и <a href="/segment/benchmark">Segment Tree benchmark</a>.
+    </p>
+</section>
+{% endblock %}

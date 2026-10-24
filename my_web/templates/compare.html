@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Сравнение · ds_learning_site{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>Сравнение структур</h1>
+    <p class="lead">
+        Обе структуры построены на одном и том же датасете
+        ({{ "{:,}".format(rows).replace(",", " ") }} заказов).
+        Ниже — асимптотики и реальные цифры с этого запуска.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Асимптотики</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Операция</th>
+                <th>Naive</th>
+                <th>Hash Map</th>
+                <th>Segment Tree</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Поиск по ключу</td>
+                <td>O(n)</td>
+                <td>O(1) avg / O(n) worst</td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>Сумма по диапазону</td>
+                <td>O(n)</td>
+                <td>—</td>
+                <td>O(log n)</td>
+            </tr>
+            <tr>
+                <td>Обновление одного значения</td>
+                <td>O(1)</td>
+                <td>—</td>
+                <td>O(log n)</td>
+            </tr>
+            <tr>
+                <td>Память</td>
+                <td>O(1)</td>
+                <td>O(n)</td>
+                <td>O(4n)</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="section">
+    <h2>Реальные цифры на этом датасете</h2>
+    <div class="grid">
+        <div class="card">
+            <div class="card-label">Hash Map · capacity</div>
+            <div class="card-value">{{ "{:,}".format(hash_capacity).replace(",", " ") }}</div>
+            <p class="card-note">build = {{ "%.1f"|format(hash_build_ms) }} ms</p>
+        </div>
+        <div class="card">
+            <div class="card-label">Hash Map · размер</div>
+            <div class="card-value">{{ "{:,}".format(rows).replace(",", " ") }}</div>
+            <p class="card-note">пар ключ → row_id</p>
+        </div>
+        <div class="card">
+            <div class="card-label">Segment Tree · n</div>
+            <div class="card-value">{{ "{:,}".format(segment_n).replace(",", " ") }}</div>
+            <p class="card-note">build = {{ "%.1f"|format(segment_build_ms) }} ms</p>
+        </div>
+        <div class="card">
+            <div class="card-label">Segment Tree · узлов</div>
+            <div class="card-value">{{ "{:,}".format(segment_tree_size).replace(",", " ") }}</div>
+            <p class="card-note">4n, как в учебной реализации</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Что мы заплатили за скорость</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ресурс</th>
+                <th>Hash Map</th>
+                <th>Segment Tree</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Память</td>
+                <td>O(n) под пары + bucket'ы</td>
+                <td>O(4n) под дерево</td>
+            </tr>
+            <tr>
+                <td>Время построения</td>
+                <td>{{ "%.1f"|format(hash_build_ms) }} ms</td>
+                <td>{{ "%.1f"|format(segment_build_ms) }} ms</td>
+            </tr>
+            <tr>
+                <td>Что ускоряет</td>
+                <td>поиск по ключу</td>
+                <td>сумма + обновление на отрезке</td>
+            </tr>
+            <tr>
+                <td>Когда не нужен</td>
+                <td>если поиск разовый</td>
+                <td>если запросов мало</td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="muted">
+        Конкретные замеры скорости — на страницах
+        <a href="/hash/benchmark">Hash Map benchmark</a> и
+        <a href="/segment/benchmark">Segment Tree benchmark</a>.
+    </p>
+</section>
+{% endblock %}
