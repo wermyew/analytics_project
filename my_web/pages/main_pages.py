@@ -27,6 +27,9 @@ def index(request: Request):
         "segment_build_ms": state.segment_build_ms,
         "hash_capacity": state.hash_index.capacity if state.hash_index else 0,
         "segment_n": len(state.segment_index) if state.segment_index else 0,
+        "graph_vertices": state.graph_vertices,
+        "graph_edges": state.graph_edges,
+        "graph_build_ms": state.graph_build_ms,
     }
 
     return templates.TemplateResponse(
@@ -46,6 +49,9 @@ def compare(request: Request):
         "segment_n": len(state.segment_index) if state.segment_index else 0,
         "segment_build_ms": state.segment_build_ms,
         "segment_tree_size": 4 * len(state.segment_index) if state.segment_index else 0,
+        "graph_vertices": state.graph_vertices,
+        "graph_edges": state.graph_edges,
+        "graph_build_ms": state.graph_build_ms,
     }
 
     return templates.TemplateResponse(

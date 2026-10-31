@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 from config import DATA_PATH, UNIQUE_FIELD, VALUE_FIELD
 from core.dataset_loader import df_to_records, load_dataset
-from services import hash_service, segment_service
+from services import hash_service, segment_service, graph_service
 from services.state import state
 from main import app
 
@@ -25,7 +25,9 @@ def _prepare_state():
 
     state.hash_index, state.hash_build_ms = hash_service.build_hash_index(state.keys)
     state.segment_index, state.segment_build_ms = segment_service.build_segment_index(records)
-
+    state.graph, state.graph_build_ms, _ = graph_service.build_or_load_product_graph(df)
+    state.graph_vertices = state.graph.num_vertices()
+    state.graph_edges = state.graph.num_edges()
     yield
 
 

@@ -115,3 +115,39 @@ class SegmentResetResponse(BaseModel):
     old_value: float
     new_value: float
     update_ms: float
+
+
+class GraphInfo(BaseModel):
+    vertices: int
+    edges: int
+    components: int
+    build_ms: float
+
+
+class PathItem(BaseModel):
+    nodes: list[int]
+    distance: float
+    length: int
+
+
+class PathsResponse(BaseModel):
+    source: int
+    target: int
+    k: int
+    paths: list[PathItem]
+    dijkstra_ms: float
+    yen_ms: float
+
+
+class GraphBenchmarkResponse(BaseModel):
+    source: int
+    target: int
+    k: int
+    dijkstra_ms: float
+    yen_ms: float
+    speedup: Optional[float] = None
+
+
+class ProductItem(BaseModel):
+    product_id: int
+    purchases: int

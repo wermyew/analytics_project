@@ -1,18 +1,22 @@
-    ds_learning_site/
-│
+ds_learning_site/
 ├── main.py
 ├── config.py
 ├── requirements.txt
-├── README.md
 ├── pytest.ini
+├── README.md
+├── .gitignore
 │
 ├── data/
-│   └── marketplace_orders_2024_2026.csv
+│   ├── marketplace_orders_2024_2026.csv
+│   └── graph_cache.pkl
 │
 ├── core/
 │   ├── __init__.py
 │   ├── hash_map.py
 │   ├── segment_tree.py
+│   ├── graph.py
+│   ├── dijkstra.py
+│   ├── yen.py
 │   ├── naive.py
 │   └── dataset_loader.py
 │
@@ -21,26 +25,30 @@
 │   ├── state.py
 │   ├── hash_service.py
 │   ├── segment_service.py
+│   ├── graph_service.py
 │   └── benchmark_service.py
 │
 ├── api/
 │   ├── __init__.py
 │   ├── hash_api.py
-│   ├── schemas.py
 │   ├── segment_api.py
-│   └── dataset_api.py
+│   ├── dataset_api.py
+│   ├── graph_api.py
+│   └── schemas.py
 │
 ├── pages/
 │   ├── __init__.py
 │   ├── main_pages.py
 │   ├── hash_pages.py
-│   ├── templates.py
-│   └── segment_pages.py
+│   ├── segment_pages.py
+│   ├── graph_pages.py
+│   └── templates.py
 │
 ├── templates/
 │   ├── base.html
-│   ├── about.html
 │   ├── index.html
+│   ├── about.html
+│   ├── compare.html
 │   ├── hash/
 │   │   ├── theory.html
 │   │   ├── demo.html
@@ -49,18 +57,24 @@
 │   │   ├── theory.html
 │   │   ├── demo.html
 │   │   └── benchmark.html
-│   └── compare.html
+│   └── graph/
+│       ├── theory.html
+│       ├── demo.html
+│       └── benchmark.html
 │
 ├── static/
 │   ├── css/
 │   │   └── style.css
 │   └── js/
 │       ├── hash_demo.js
-│       └── segment_demo.js
+│       ├── segment_demo.js
+│       └── graph_demo.js
 │
 └── tests/
     ├── __init__.py
     ├── conftest.py
     ├── test_hash_map.py
     ├── test_segment_tree.py
-    └── test_api.py
+    ├── test_graph.py
+    ├── test_api.py
+    └── test_api_graph.py

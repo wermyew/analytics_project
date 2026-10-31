@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Yen's K paths · теория{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>Yen's K shortest paths</h1>
+    <p class="lead">
+        Алгоритм Йена находит <strong>K кратчайших простых путей</strong>
+        между двумя вершинами графа. В нашем случае граф — это товары маркетплейса,
+        а рёбра — «эти товары покупают вместе».
+    </p>
+</section>
+
+<section class="section">
+    <h2>Что такое граф товаров</h2>
+    <ul>
+        <li><strong>Вершины</strong> — <code>product_id</code> ({{ graph_vertices }} товаров).</li>
+        <li><strong>Рёбра</strong> — есть, если хотя бы один <code>user_id</code> купил оба товара ({{ "{:,}".format(graph_edges).replace(",", " ") }} рёбер).</li>
+        <li><strong>Вес ребра</strong> — <code>1 / количество общих покупателей</code>.
+            Чем больше людей купили пару, тем <em>ближе</em> товары (меньше расстояние).</li>
+    </ul>
+    <p class="muted">
+        Граф построен по всем 120 000 заказам датасета.
+        Построение заняло {{ "%.0f"|format(graph_build_ms) }} мс при старте сервера.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Как работает алгоритм</h2>
+    <ol>
+        <li><strong>Первый путь</strong> — обычная Дейкстра: находит кратчайший путь
+            от <code>source</code> до <code>target</code>.</li>
+        <li><strong>Отклонения.</strong> Для каждой вершины предыдущего пути (кроме последней)
+            «отклоняем» путь: запрещаем ребро, по которому он пошёл, и все вершины корня
+            (чтобы путь остался простым).</li>
+        <li><strong>Spur-путь.</strong> Из отклонённой вершины ищем Дейкстрой путь до
+            <code>target</code> с учётом запретов. Склеиваем <code>root + spur</code> → кандидат.</li>
+        <li><strong>Выбор.</strong> Из всех кандидатов берём минимальный по расстоянию —
+            это следующий путь. Повторяем, пока не наберём K путей.</li>
+    </ol>
+</section>
+
+<section class="section">
+    <h2>Сложности</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Алгоритм</th>
+                <th>Время</th>
+                <th>Что находит</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Дейкстра</td>
+                <td>O((V + E) log V)</td>
+                <td>1 кратчайший путь</td>
+            </tr>
+            <tr>
+                <td>Йен (K путей)</td>
+                <td>O(K · (V + E) log V)</td>
+                <td>K кратчайших простых путей</td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="muted">
+        V = {{ graph_vertices }}, E = {{ "{:,}".format(graph_edges).replace(",", " ") }}.
+        На нашем графе один путь через Дейкстру — единицы миллисекунд,
+        K=3 пути через Йена — десятки миллисекунд.
+    </p>
+</section>
+
+<section class="section">
+    <h2>Зачем K путей</h2>
+    <p>
+        Дейкстра находит <strong>один</strong> лучший путь. Но в рекомендательных системах
+        одного пути мало: если первый вариант пользователю не подошёл, нужен второй,
+        третий. Йен даёт <strong>альтернативы</strong>, отсортированные по «близости».
+    </p>
+    <p>
+        Пример: пользователь купил <code>product_1</code>. Мы хотим порекомендовать
+        <code>product_36</code>, но показать <strong>разные цепочки</strong>, почему это
+        имеет смысл: «эти товары часто покупают вместе», «через эти товары тоже можно дойти».
+    </p>
+</section>
+
+<section class="section">
+    <a class="btn" href="/graph/demo">Попробовать поиск →</a>
+    <a class="btn secondary" href="/graph/benchmark">Замеры →</a>
+</section>
+{% endblock %}

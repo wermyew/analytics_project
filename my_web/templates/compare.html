@@ -21,6 +21,7 @@
                 <th>Naive</th>
                 <th>Hash Map</th>
                 <th>Segment Tree</th>
+                <th>Yen's K paths</th>
             </tr>
         </thead>
         <tbody>
@@ -29,27 +30,42 @@
                 <td>O(n)</td>
                 <td>O(1) avg / O(n) worst</td>
                 <td>—</td>
+                <td>—</td>
             </tr>
             <tr>
                 <td>Сумма по диапазону</td>
                 <td>O(n)</td>
                 <td>—</td>
                 <td>O(log n)</td>
+                <td>—</td>
             </tr>
             <tr>
                 <td>Обновление одного значения</td>
                 <td>O(1)</td>
                 <td>—</td>
                 <td>O(log n)</td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>K кратчайших путей</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>O(K · (V + E) log V)</td>
             </tr>
             <tr>
                 <td>Память</td>
                 <td>O(1)</td>
                 <td>O(n)</td>
                 <td>O(4n)</td>
+                <td>O(V + E)</td>
             </tr>
         </tbody>
     </table>
+    <p class="muted">
+        V — число вершин графа товаров (~1000), E — число рёбер.
+        K — сколько путей просим у Йена.
+    </p>
 </section>
 
 <section class="section">

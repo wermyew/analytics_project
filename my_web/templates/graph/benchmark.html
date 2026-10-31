@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Yen's K paths · бенчмарк{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>Замеры: Дейкстра vs Йен</h1>
+    <p class="lead">
+        Сравниваем время двух алгоритмов на одном и том же графе товаров
+        (V = {{ graph_vertices }}, E = {{ "{:,}".format(graph_edges).replace(",", " ") }}).
+        Дейкстра находит <strong>один</strong> путь, Йен — <strong>K</strong> путей.
+        Йен вызывает Дейкстру K раз (с отклонениями), поэтому ожидаемо медленнее
+        в K раз — но даёт K альтернатив.
+    </p>
+
+    <form id="bench-form" class="form-row">
+        <div class="form-field">
+            <label for="source-input">source (product_id)</label>
+            <input type="number" id="source-input" min="1" max="1000" value="1" required>
+        </div>
+        <div class="form-field">
+            <label for="target-input">target (product_id)</label>
+            <input type="number" id="target-input" min="1" max="1000" value="36" required>
+        </div>
+        <div class="form-field">
+            <label for="k-input">K (путей)</label>
+            <input type="number" id="k-input" min="1" max="{{ max_k }}" value="{{ default_k }}" required>
+        </div>
+        <button type="button" class="btn" id="bench-run">Запустить</button>
+    </form>
+
+    <div id="bench-error" class="error hidden"></div>
+    <div id="bench-result" class="result hidden"></div>
+</section>
+
+<section class="section">
+    <h2>Что покажет результат</h2>
+    <ul>
+        <li><strong>Дейкстра</strong> — время одного поиска кратчайшего пути.</li>
+        <li><strong>Йен</strong> — время поиска K путей (K вызовов Дейкстры + склейка).</li>
+        <li><strong>Отношение</strong> — во сколько раз Йен медленнее Дейкстры.
+            Ожидаемо 2–10× при K=3–5.</li>
+    </ul>
+    <p class="muted">
+        Замеры делаются «в лоб»: один прогон каждого алгоритма.
+        На K=1 Йен ≈ Дейкстра (один и тот же поиск).
+        Чем больше K, тем сильнее разница.
+    </p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const form = document.getElementById("bench-form");
+const sourceInput = document.getElementById("source-input");
+const targetInput = document.getElementById("target-input");
+const kInput = document.getElementById("k-input");
+const runBtn = document.getElementById("bench-run");
+const resultBox = document.getElementById("bench-result");
+const errorBox = document.getElementById("bench-error");
+
+function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.classList.remove("hidden");
+    resultBox.classList.add("hidden");
+}
+
+function fmtMs(v) {
+    if (v === null || v === undefined) return "—";
+    if (v < 1) return v.toFixed(3) + " ms";
+    return v.toFixed(1) + " ms";
+}
+
+runBtn.addEventListener("click", async () => {
+    errorBox.classList.add("hidden");
+
+    const source = parseInt(sourceInput.value, 10);
+    const target = parseInt(targetInput.value, 10);
+    const k = parseInt(kInput.value, 10);
+
+    if (!Number.isInteger(source) || source < 1) {
+        showError("source должен быть положительным целым");
+        return;
+    }
+    if (!Number.isInteger(target) || target < 1) {
+        showError("target должен быть положительным целым");
+        return;
+    }
+    if (!Number.isInteger(k) || k < 1) {
+        showError("K должен быть положительным целым");
+        return;
+    }
+    if (source === target) {
+        showError("source и target должны различаться");
+        return;
+    }
+
+    runBtn.disabled = true;
+    runBtn.innerHTML = `<span class="spinner"></span>Считаю…`;
+
+    try {
+        const url = `/api/graph/benchmark?source=${encodeURIComponent(source)}`
+                  + `&target=${encodeURIComponent(target)}`
+                  + `&k=${encodeURIComponent(k)}`;
+        const resp = await fetch(url);
+        if (!resp.ok) {
+            const body = await resp.json().catch(() => ({}));
+            throw new Error(body.detail || `HTTP ${resp.status}`);
+        }
+        const data = await resp.json();
+
+        resultBox.classList.remove("hidden");
+        resultBox.innerHTML = `
+            <dl class="kv">
+                <dt>source → target</dt><dd>${data.source} → ${data.target}</dd>
+                <dt>K</dt><dd>${data.k}</dd>
+                <dt>Дейкстра (1 путь)</dt><dd>${fmtMs(data.dijkstra_ms)}</dd>
+                <dt>Йен (${data.k} путей)</dt><dd>${fmtMs(data.yen_ms)}</dd>
+            </dl>
+            <div class="metric-row">
+                <div class="metric">
+                    <span class="metric-label">Йен / Дейкстра</span>
+                    <span class="metric-value">${data.speedup ? data.speedup.toFixed(2) + "×" : "—"}</span>
+                </div>
+            </div>
+            <p class="muted">
+                Йен медленнее Дейкстры в ~K раз — это цена за K альтернатив.
+                При K=1 алгоритмы должны давать одинаковое время.
+            </p>
+        `;
+    } catch (e) {
+        showError("Ошибка: " + e.message);
+    } finally {
+        runBtn.disabled = false;
+        runBtn.textContent = "Запустить";
+    }
+});
+</script>
+{% endblock %}

@@ -18,6 +18,7 @@ from typing import Optional
 import pandas as pd
 from core.hash_map import HashMap
 from core.segment_tree import SegmentTreeIndex
+from core.graph import Graph
 
 
 @dataclass
@@ -25,6 +26,10 @@ class AppState:
     df: Optional[pd.DataFrame] = None
     hash_index: Optional[HashMap] = None
     segment_index: Optional[SegmentTreeIndex] = None
+    graph: Optional[Graph] = None
+    graph_build_ms: float = 0.0
+    graph_vertices: int = 0
+    graph_edges: int = 0
 
     # кэш значений для naive-бенчмарков и для отката update
     values: list[float] = field(default_factory=list)
@@ -44,5 +49,9 @@ class AppState:
             and self.segment_index is not None
         )
 
+    @property
+    def is_graph_ready(self) -> bool:
+
+        return self.graph is not None
 
 state = AppState()
