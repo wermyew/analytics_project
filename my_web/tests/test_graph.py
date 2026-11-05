@@ -232,3 +232,92 @@ def test_yen_all_paths_distinct():
     result = yen_k_shortest_paths(g, 1, 3, K=5)
     paths = [p for p, _ in result]
     assert len(paths) == len(set(map(tuple, paths)))
+
+
+# ============================================================
+# Дейкстра: heapq vs своя MinHeap
+# ============================================================
+
+def test_dijkstra_own_heap_same_result():
+    """Своя куча даёт тот же путь и distance, что и heapq."""
+    g = Graph()
+    g.add_edge(1, 2, 1.0)
+    g.add_edge(2, 3, 1.0)
+    g.add_edge(1, 3, 3.0)
+    g.add_edge(1, 4, 0.5)
+    g.add_edge(4, 3, 0.5)
+
+    path1, dist1 = dijkstra(g, 1, 3, use_own_heap=False)
+    path2, dist2 = dijkstra(g, 1, 3, use_own_heap=True)
+
+    assert path1 == path2
+    assert abs(dist1 - dist2) < 1e-9
+
+
+def test_dijkstra_own_heap_banned_edges():
+    """Своя куча учитывает banned_edges так же, как heapq."""
+    g = Graph()
+    g.add_edge(1, 2, 1.0)
+    g.add_edge(2, 3, 1.0)
+    g.add_edge(1, 3, 3.0)
+
+    banned = {frozenset({1, 2})}
+
+    path1, dist1 = dijkstra(g, 1, 3, banned_edges=banned, use_own_heap=False)
+    path2, dist2 = dijkstra(g, 1, 3, banned_edges=banned, use_own_heap=True)
+
+    assert path1 == path2 == [1, 3]
+    assert abs(dist1 - dist2) < 1e-9
+
+
+def test_dijkstra_own_heap_banned_nodes():
+    """Своя куча учитывает banned_nodes так же, как heapq."""
+    g = Graph()
+    g.add_edge(1, 2, 1.0)
+    g.add_edge(2, 3, 1.0)
+    g.add_edge(1, 3, 3.0)
+
+    path1, dist1 = dijkstra(g, 1, 3, banned_nodes={2}, use_own_heap=False)
+    path2, dist2 = dijkstra(g, 1, 3, banned_nodes={2}, use_own_heap=True)
+
+    assert path1 == path2 == [1, 3]
+    assert abs(dist1 - dist2) < 1e-9
+
+
+def test_dijkstra_own_heap_no_path():
+    """Обе кучи возвращают None, если пути нет."""
+    g = Graph()
+    g.add_edge(1, 2, 1.0)
+    g.add_edge(3, 4, 1.0)
+
+    path1, dist1 = dijkstra(g, 1, 4, use_own_heap=False)
+    path2, dist2 = dijkstra(g, 1, 4, use_own_heap=True)
+
+    assert path1 is None
+    assert path2 is None
+    assert math.isinf(dist1)
+    assert math.isinf(dist2)
+
+
+def test_dijkstra_own_heap_random_graph():
+    """На случайном графе своя куча даёт тот же результат."""
+    import random
+    rng = random.Random(42)
+
+    g = Graph()
+    # 50 вершин, ~200 рёбер
+    for _ in range(200):
+        u = rng.randint(1, 50)
+        v = rng.randint(1, 50)
+        w = rng.uniform(0.1, 10.0)
+        g.add_edge(u, v, w)
+
+    # пара вершин, которые точно в графе
+    vertices = g.vertices()
+    source, target = vertices[0], vertices[-1]
+
+    path1, dist1 = dijkstra(g, source, target, use_own_heap=False)
+    path2, dist2 = dijkstra(g, source, target, use_own_heap=True)
+
+    assert path1 == path2
+    assert abs(dist1 - dist2) < 1e-9

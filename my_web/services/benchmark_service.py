@@ -103,3 +103,41 @@ def benchmark_segment(
         "tree_ms": st_ms,
         "speedup": speedup,
     }
+
+
+def benchmark_dijkstra(
+    graph,
+    source: int,
+    target: int,
+    n_runs: int = 5,
+) -> dict:
+    """Сравнить Дейкстру на heapq (C) и на своей MinHeap (Python).
+
+    n_runs — сколько раз прогнать каждый вариант, чтобы усреднить шум.
+    Возвращает среднее время в мс и замедление (own / heapq).
+    """
+
+    from core.dijkstra import dijkstra
+
+    # heapq
+    start = perf_counter()
+    for _ in range(n_runs):
+        dijkstra(graph, source, target, use_own_heap=False)
+    heapq_ms = (perf_counter() - start) * 1000.0 / n_runs
+
+    # своя куча
+    start = perf_counter()
+    for _ in range(n_runs):
+        dijkstra(graph, source, target, use_own_heap=True)
+    own_heap_ms = (perf_counter() - start) * 1000.0 / n_runs
+
+    slowdown = own_heap_ms / heapq_ms if heapq_ms > 0 else None
+
+    return {
+        "source": source,
+        "target": target,
+        "n_runs": n_runs,
+        "heapq_ms": heapq_ms,
+        "own_heap_ms": own_heap_ms,
+        "slowdown": slowdown,
+    }

@@ -117,6 +117,34 @@ runBtn.addEventListener("click", async () => {
                 <dt>Дейкстра (1 путь)</dt><dd>${fmtMs(data.dijkstra_ms)}</dd>
                 <dt>Йен (${data.k} путей)</dt><dd>${fmtMs(data.yen_ms)}</dd>
             </dl>
+            <h3 style="margin-top: 20px;">Дейкстра: heapq (C) vs своя MinHeap (Python)</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Реализация кучи</th>
+                        <th>Время</th>
+                        <th>Замедление</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>heapq</code> (C, stdlib)</td>
+                        <td>${fmtMs(data.heapq_ms)}</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>своя <code>MinHeap</code> (Python)</td>
+                        <td>${fmtMs(data.own_heap_ms)}</td>
+                        <td>${data.slowdown ? data.slowdown.toFixed(2) + "×" : "—"}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="muted">
+                Своя куча на Python медленнее <code>heapq</code> на C в
+                ${data.slowdown ? data.slowdown.toFixed(1) + " раз" : "несколько раз"}.
+                Это цена за интерпретацию Python vs скомпилированный C.
+                Алгоритм Дейкстры один и тот же, меняется только источник кучи.
+            </p>
             <div class="metric-row">
                 <div class="metric">
                     <span class="metric-label">Йен / Дейкстра</span>

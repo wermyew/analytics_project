@@ -10,8 +10,8 @@ from api.schemas import (
     PathsResponse,
     ProductItem,
 )
-from config import DEFAULT_K, MAX_K
-from services import graph_service
+from config import DEFAULT_K, DIJKSTRA_BENCH_RUNS, MAX_K
+from services import graph_service, benchmark_service
 from services.state import state
 from core.dijkstra import dijkstra
 
@@ -108,6 +108,11 @@ def graph_benchmark(
     graph_service.find_k_paths(state.graph, source, target, k=k)
     yen_ms = (perf_counter() - start) * 1000.0
 
+    # Дейкстра: heapq vs своя MinHeap
+    bench = benchmark_service.benchmark_dijkstra(
+        state.graph, source, target, n_runs=DIJKSTRA_BENCH_RUNS,
+    )
+
     speedup = dijkstra_ms / yen_ms if yen_ms > 0 else None
 
     return GraphBenchmarkResponse(
@@ -117,6 +122,9 @@ def graph_benchmark(
         dijkstra_ms=dijkstra_ms,
         yen_ms=yen_ms,
         speedup=speedup,
+        heapq_ms=bench["heapq_ms"],
+        own_heap_ms=bench["own_heap_ms"],
+        slowdown=bench["slowdown"],
     )
 
 

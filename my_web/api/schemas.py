@@ -147,6 +147,11 @@ class GraphBenchmarkResponse(BaseModel):
     yen_ms: float
     speedup: Optional[float] = None
 
+    # сравнение heapq vs своя MinHeap
+    heapq_ms: float
+    own_heap_ms: float
+    slowdown: Optional[float] = None
+
 
 class ProductItem(BaseModel):
     product_id: int

@@ -102,6 +102,25 @@ def test_graph_benchmark(client):
     if data["speedup"] is not None:
         assert data["speedup"] >= 0
 
+    # новые поля: heapq vs своя куча
+    assert "heapq_ms" in data
+    assert "own_heap_ms" in data
+    assert "slowdown" in data
+
+    assert data["heapq_ms"] >= 0
+    assert data["own_heap_ms"] >= 0
+
+    # своя куча на Python должна быть не быстрее heapq (C)
+    # допускаем небольшой шум: own_heap_ms >= heapq_ms * 0.5
+    assert data["own_heap_ms"] >= data["heapq_ms"] * 0.5, (
+        f"своя куча подозрительно быстрая: "
+        f"own={data['own_heap_ms']:.3f}, heapq={data['heapq_ms']:.3f}"
+    )
+
+    # slowdown = own / heapq — должен быть положительным
+    if data["slowdown"] is not None:
+        assert data["slowdown"] > 0
+
 
 def test_graph_benchmark_k1(client):
     """При K=1 Йен ≈ Дейкстра."""
@@ -109,6 +128,11 @@ def test_graph_benchmark_k1(client):
     r = client.get("/api/graph/benchmark?source=1&target=36&k=1")
     assert r.status_code == 200
 
+    data = r.json()
+    # новые поля тоже есть
+    assert "heapq_ms" in data
+    assert "own_heap_ms" in data
+    assert "slowdown" in data
 
 # ============================================================
 # /api/graph/products

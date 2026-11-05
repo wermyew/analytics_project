@@ -31,3 +31,6 @@ MAX_K = 10                     # максимум K
 # Кэш графа
 GRAPH_CACHE_PATH = BASE_DIR / "data" / "graph_cache.pkl"
 GRAPH_CACHE_VERSION = 1   # менять при изменении формата графа
+
+# Бенчмарк Дейкстры: heapq vs своя MinHeap
+DIJKSTRA_BENCH_RUNS = 5
