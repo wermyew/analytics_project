@@ -14,15 +14,15 @@ from services.state import state
 router = APIRouter(prefix="/api/hash", tags=["hash"])
 
 
-def _ensure_ready() -> None:
-    if not state.is_ready:
+def _ensure_hash_ready() -> None:
+    if not state.is_hash_ready:
 
-        raise HTTPException(status_code=503, detail="Индексы ещё не построены")
+        raise HTTPException(status_code=503, detail="Hash-индекс не построен")
 
 
 @router.get("/search/{order_id}", response_model=HashSearchResponse)
 def hash_search(order_id: int) -> HashSearchResponse:
-    _ensure_ready()
+    _ensure_hash_ready()
 
     result = hash_service.search_order(
         df=state.df,
@@ -53,7 +53,7 @@ def hash_search(order_id: int) -> HashSearchResponse:
 
 @router.get("/benchmark", response_model=HashBenchmarkResponse)
 def hash_benchmark(n_queries: int = 30) -> HashBenchmarkResponse:
-    _ensure_ready()
+    _ensure_hash_ready()
 
     result = benchmark_service.benchmark_hash(
         keys=state.keys,

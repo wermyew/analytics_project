@@ -132,10 +132,9 @@ def graph_benchmark(
 def graph_products(
     limit: int = Query(100, ge=1, le=1000),
 ) -> list[ProductItem]:
-
     _ensure_graph_ready()
 
-    counts = state.df["product_id"].value_counts()
+    counts = state.df[state.fields["source"]].value_counts()
     result = []
 
     for pid, cnt in counts.head(limit).items():

@@ -33,12 +33,15 @@ def dijkstra(
     banned_nodes = banned_nodes or set()
 
     if source == target:
+
         return ([source], 0.0)
 
     if source in banned_nodes or target in banned_nodes:
+
         return (None, math.inf)
 
     if not graph.has_vertex(source) or not graph.has_vertex(target):
+
         return (None, math.inf)
 
     dist = {source: 0.0}

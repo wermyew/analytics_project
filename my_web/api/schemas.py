@@ -25,15 +25,7 @@ class DatasetInfo(BaseModel):
 
 
 class DatasetHeadRow(BaseModel):
-    order_id: int
-    user_id: int
-    product_id: int
-    category: str
-    quantity: int
-    price: float
-    total: float
-    created_at: str
-
+    model_config = {"extra": "allow"}
 
 class DatasetHeadResponse(BaseModel):
     rows: list[DatasetHeadRow]
@@ -156,3 +148,43 @@ class GraphBenchmarkResponse(BaseModel):
 class ProductItem(BaseModel):
     product_id: int
     purchases: int
+
+
+# ---------- upload ----------
+
+class UploadResponse(BaseModel):
+    upload_id: str
+    columns: list[str]
+    preview: list[dict]
+    rows: int
+
+
+class ConfigureRequest(BaseModel):
+    upload_id: str
+    fields: dict   # {"unique_id": ..., "order": ..., "value": ..., "source": ..., "target": ...}
+
+
+class ConfigureResponse(BaseModel):
+    status: str
+    rows: int
+    fields: dict
+
+
+class BuildRequest(BaseModel):
+    structures: list[str]   # ["hash", "segment", "graph"]
+
+
+class BuildResponse(BaseModel):
+    status: str
+
+
+class BuildStatusResponse(BaseModel):
+    status: str             # "idle" | "building" | "ready" | "error"
+    progress: float         # 0.0 .. 1.0
+    error: str
+    structures: list[str]
+
+
+class ResetResponse(BaseModel):
+    status: str
+    rows: int

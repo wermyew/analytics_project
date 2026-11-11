@@ -19,6 +19,7 @@ class Graph:
 
     def add_vertex(self, v) -> None:
         """Добавить вершину без рёбер."""
+
         if v not in self._adj:
             self._adj[v] = []
 

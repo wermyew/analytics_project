@@ -6,8 +6,8 @@ from time import perf_counter
 import numpy as np
 from core.hash_map import HashMap
 from core.naive import linear_search, naive_range_sum
-from core.segment_tree import SegmentTreeIndex
-from core.segment_tree import SegmentTree
+from core.segment_tree import SegmentTreeIndex, SegmentTree
+from core.dijkstra import dijkstra
 
 
 def benchmark_hash(
@@ -116,8 +116,6 @@ def benchmark_dijkstra(
     n_runs — сколько раз прогнать каждый вариант, чтобы усреднить шум.
     Возвращает среднее время в мс и замедление (own / heapq).
     """
-
-    from core.dijkstra import dijkstra
 
     # heapq
     start = perf_counter()

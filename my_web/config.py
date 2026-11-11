@@ -10,13 +10,30 @@ BASE_DIR = Path(__file__).resolve().parent
 # Данные
 DATA_PATH = BASE_DIR / "data" / "marketplace_orders_2024_2026.csv"
 
-# Имена полей датасета
-ORDER_FIELD = "created_at"   # ось, по которой сортируем
-VALUE_FIELD = "total"        # числовое поле для суммы
-UNIQUE_FIELD = "order_id"    # ключ для хеш-индекса
+DEFAULT_UNIQUE_FIELD = "order_id"
+DEFAULT_ORDER_FIELD = "created_at"
+DEFAULT_VALUE_FIELD = "total"
+DEFAULT_SOURCE_FIELD = "product_id"
+DEFAULT_TARGET_FIELD = "user_id"
+
+DEFAULT_FIELDS = {
+    "unique_id": DEFAULT_UNIQUE_FIELD,
+    "order": DEFAULT_ORDER_FIELD,
+    "value": DEFAULT_VALUE_FIELD,
+    "source": DEFAULT_SOURCE_FIELD,
+    "target": DEFAULT_TARGET_FIELD,
+}
+
+UPLOADS_DIR = BASE_DIR / "data" / "uploads"
+
+# лимиты загрузки
+MAX_UPLOAD_SIZE_MB = 100
+MAX_ROWS = 500_000
+MAX_COLUMNS = 50
 
 # Начальная capacity хеш-таблицы
 HASH_INITIAL_CAPACITY = 10
+MAX_LOAD_FACTOR = 0.75
 
 # Лимиты для демо-эндпоинтов (чтобы не положить сервер тяжёлым запросом)
 MAX_BENCHMARK_QUERIES = 100

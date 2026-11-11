@@ -1,24 +1,29 @@
 """Сервис дерева отрезков: построение, query, update, бенчмарк."""
 
 from __future__ import annotations
-import random
 from time import perf_counter
 import pandas as pd
-from config import ORDER_FIELD, VALUE_FIELD
 from core.naive import naive_range_sum
 from core.segment_tree import SegmentTreeIndex
+from core.dataset_loader import df_to_records
 
 
 def build_segment_index(
-    records: list[dict],
+    df: pd.DataFrame,
+    order_field: str,
+    value_field: str,
 ) -> tuple[SegmentTreeIndex, float]:
-    """Строит SegmentTreeIndex. Возвращает (index, время_построения_мс)."""
+    """Построить SegmentTreeIndex из df.
+    Возвращает (index, время_построения_мс).
+    """
+
+    records = df_to_records(df, order_field, value_field)
 
     start = perf_counter()
     index = SegmentTreeIndex(
         records,
-        value_field=VALUE_FIELD,
-        order_field=ORDER_FIELD,
+        value_field=value_field,
+        order_field=order_field,
     )
     elapsed_ms = (perf_counter() - start) * 1000.0
 
@@ -31,6 +36,7 @@ def query_range(
     values: list[float],
     l: int,
     r: int,
+    order_field: str,
 ) -> dict:
     """Сумма total за [l, r] через дерево и через naive.
 
@@ -56,8 +62,8 @@ def query_range(
         "naive_sum": float(naive_sum),
         "tree_ms": tree_ms,
         "naive_ms": naive_ms,
-        "date_from": df[ORDER_FIELD].iloc[l].date().isoformat(),
-        "date_to": df[ORDER_FIELD].iloc[r].date().isoformat(),
+        "date_from": df[order_field].iloc[l].date().isoformat(),
+        "date_to": df[order_field].iloc[r].date().isoformat(),
         "matches": abs(tree_sum - naive_sum) < 1e-6,
     }
 
@@ -68,6 +74,7 @@ def update_value(
     values: list[float],
     pos: int,
     value: float,
+    value_field: str,
 ) -> dict:
     """Меняет total у записи pos. Обновляет и records, и values, и дерево."""
 
@@ -82,7 +89,7 @@ def update_value(
     update_ms = (perf_counter() - start) * 1000.0
 
     values[pos] = value
-    df.at[pos, VALUE_FIELD] = value
+    df.at[pos, value_field] = value
 
     return {
         "pos": pos,
@@ -98,6 +105,7 @@ def reset_value(
     values: list[float],
     pos: int,
     original: float,
+    value_field: str,
 ) -> dict:
     """Возвращает total записи pos к исходному значению.
 
@@ -113,7 +121,7 @@ def reset_value(
     current = values[pos]
     index.update(pos, original)
     values[pos] = original
-    df.at[pos, VALUE_FIELD] = original
+    df.at[pos, value_field] = original
 
     return {
         "pos": pos,

@@ -18,14 +18,14 @@ from services.state import state
 router = APIRouter(prefix="/api/segment", tags=["segment"])
 
 
-def _ensure_ready() -> None:
-    if not state.is_ready:
-        raise HTTPException(status_code=503, detail="Индексы ещё не построены")
+def _ensure_segment_ready() -> None:
+    if not state.is_segment_ready:
+        raise HTTPException(status_code=503, detail="Segment-индекс не построен")
 
 
 @router.get("/query", response_model=SegmentQueryResponse)
 def segment_query(l: int, r: int) -> SegmentQueryResponse:
-    _ensure_ready()
+    _ensure_segment_ready()
 
     if l < 0 or r < 0:
         raise HTTPException(status_code=400, detail="l и r должны быть >= 0")
@@ -49,6 +49,7 @@ def segment_query(l: int, r: int) -> SegmentQueryResponse:
             values=state.values,
             l=l,
             r=r,
+            order_field=state.fields["order"],
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -58,7 +59,7 @@ def segment_query(l: int, r: int) -> SegmentQueryResponse:
 
 @router.post("/update", response_model=SegmentUpdateResponse)
 def segment_update(payload: SegmentUpdateRequest) -> SegmentUpdateResponse:
-    _ensure_ready()
+    _ensure_segment_ready()
 
     try:
         result = segment_service.update_value(
@@ -67,6 +68,7 @@ def segment_update(payload: SegmentUpdateRequest) -> SegmentUpdateResponse:
             values=state.values,
             pos=payload.pos,
             value=payload.value,
+            value_field=state.fields["value"],
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -84,19 +86,20 @@ def segment_update(payload: SegmentUpdateRequest) -> SegmentUpdateResponse:
 
 @router.get("/benchmark", response_model=SegmentBenchmarkResponse)
 def segment_benchmark(n_ops: int = 2000) -> SegmentBenchmarkResponse:
-    _ensure_ready()
+    _ensure_segment_ready()
     n_ops = max(1, min(n_ops, MAX_BENCHMARK_QUERIES * 20))
     result = benchmark_service.benchmark_segment(
         values=state.values,
         index=state.segment_index,
         n_ops=n_ops,
     )
+
     return SegmentBenchmarkResponse(**result)
 
 
 @router.post("/reset", response_model=SegmentResetResponse)
 def segment_reset(payload: SegmentResetRequest) -> SegmentResetResponse:
-    _ensure_ready()
+    _ensure_segment_ready()
 
     pos = payload.pos
     if pos < 0 or pos >= len(state.values):
@@ -111,6 +114,7 @@ def segment_reset(payload: SegmentResetRequest) -> SegmentResetResponse:
         values=state.values,
         pos=pos,
         original=original,
+        value_field=state.fields["value"],
     )
     update_ms = (perf_counter() - start) * 1000.0
 

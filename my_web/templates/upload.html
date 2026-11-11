@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Загрузка датасета · ds_learning_site{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>Загрузить свой датасет</h1>
+    <p class="lead">
+        Загрузите CSV, выберите поля — и сайт построит индексы на ваших данных.
+        Структуры (hash, segment, graph) опциональны.
+    </p>
+
+    <!-- Шаг 1: загрузка -->
+    <div id="step-1" class="upload-step">
+        <h2>Шаг 1. CSV-файл</h2>
+        <div class="form-row">
+            <input type="file" id="file-input" accept=".csv">
+            <button class="btn" id="upload-btn">Загрузить</button>
+        </div>
+        <div id="error-1" class="error hidden"></div>
+    </div>
+
+    <!-- Шаг 2: выбор полей -->
+    <div id="step-2" class="upload-step hidden">
+        <h2>Шаг 2. Выберите поля</h2>
+        <p class="muted">
+            Датасет: <span id="rows-info">—</span> строк, <span id="cols-info">—</span> колонок.
+        </p>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="field-unique">Уникальный ID (hash)</label>
+                <select id="field-unique"></select>
+            </div>
+            <div class="form-field">
+                <label for="field-order">Ось (segment, дата)</label>
+                <select id="field-order"></select>
+            </div>
+            <div class="form-field">
+                <label for="field-value">Числовое поле (segment)</label>
+                <select id="field-value"></select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="field-source">source (graph)</label>
+                <select id="field-source"></select>
+            </div>
+            <div class="form-field">
+                <label for="field-target">target (graph)</label>
+                <select id="field-target"></select>
+            </div>
+        </div>
+
+        <button class="btn" id="configure-btn">Далее</button>
+        <div id="error-2" class="error hidden"></div>
+    </div>
+
+    <!-- Шаг 3: выбор структур -->
+    <div id="step-3" class="upload-step hidden">
+        <h2>Шаг 3. Выберите структуры</h2>
+        <div class="form-row">
+            <label><input type="checkbox" id="s-hash" checked> Hash Map</label>
+            <label><input type="checkbox" id="s-segment" checked> Segment Tree</label>
+            <label><input type="checkbox" id="s-graph" checked> Graph + Yen</label>
+        </div>
+        <button class="btn" id="build-btn">Построить</button>
+        <div id="error-3" class="error hidden"></div>
+    </div>
+
+    <!-- Шаг 4: прогресс -->
+    <div id="step-4" class="upload-step hidden">
+        <h2>Шаг 4. Построение...</h2>
+        <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
+        </div>
+        <p class="muted" id="progress-text">0%</p>
+        <div id="error-4" class="error hidden"></div>
+    </div>
+
+    <!-- Шаг 5: готово -->
+    <div id="step-5" class="upload-step hidden">
+        <h2>Готово!</h2>
+        <p>Индексы построены. <a href="/">На главную →</a></p>
+        <button class="btn secondary" id="reset-btn">Сбросить к дефолту</button>
+        <div id="error-5" class="error hidden"></div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/upload.js') }}"></script>
+{% endblock %}

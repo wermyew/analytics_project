@@ -9,11 +9,16 @@ from pathlib import Path
 import pandas as pd
 
 
-ORDER_FIELD = "created_at"
-VALUE_FIELD = "total"
+def load_dataset(
+    path: str | Path,
+    order_field: str | None = None,
+) -> pd.DataFrame:
+    """Загрузить CSV/parquet/xlsx в DataFrame.
 
+    order_field — по какому полю сортировать (и парсить как дату).
+    Если None — не сортируем, не парсим. Для /upload и /configure.
+    """
 
-def load_dataset(path: str | Path) -> pd.DataFrame:
     path = str(path)
     suffix = Path(path).suffix.lower()
 
@@ -27,21 +32,21 @@ def load_dataset(path: str | Path) -> pd.DataFrame:
 
         raise ValueError(f"Неизвестный формат: {suffix}")
 
-    if ORDER_FIELD not in df.columns:
+    if order_field is not None:
+        if order_field not in df.columns:
 
-        raise ValueError(f"Нет колонки {ORDER_FIELD!r}")
+            raise ValueError(f"Нет колонки {order_field!r}")
 
-    if VALUE_FIELD not in df.columns:
-
-        raise ValueError(f"Нет колонки {VALUE_FIELD!r}")
-
-    df[ORDER_FIELD] = pd.to_datetime(df[ORDER_FIELD])
-    df = df.sort_values(ORDER_FIELD).reset_index(drop=True)
+        df[order_field] = pd.to_datetime(df[order_field])
+        df = df.sort_values(order_field).reset_index(drop=True)
 
     return df
 
 
-def df_to_records(df: pd.DataFrame) -> list[dict]:
-    """DataFrame → list[dict], как ожидает SegmentTreeIndex."""
+def df_to_records(
+    df: pd.DataFrame,
+    order_field: str,
+    value_field: str,
+) -> list[dict]:
 
-    return df[[ORDER_FIELD, VALUE_FIELD]].to_dict("records")
+    return df[[order_field, value_field]].to_dict("records")

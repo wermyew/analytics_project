@@ -1,10 +1,11 @@
 """Сервис графа товаров: построение из df, поиск K путей, метрики.
 
 Граф:
-- вершины  — product_id (int)
-- рёбра    — есть, если хотя бы один user_id купил оба товара
-- вес      — 1 / количество общих покупателей
-             (чем больше общих, тем ближе товары → меньше расстояние)
+- вершины — df[source_field] (например, product_id)
+- рёбра — есть, если хотя бы один df[target_field] (например, user_id)
+           связан с обоими source
+- вес — 1 / количество общих target
+             (чем больше общих, тем ближе вершины → меньше расстояние)
 
 Йен ищет K кратчайших путей между source и target.
 """
@@ -21,13 +22,17 @@ import pickle
 
 def build_product_graph(
     df: pd.DataFrame,
+    source_field: str,
+    target_field: str,
     min_purchases: int = GRAPH_MIN_PURCHASES,
 ) -> tuple[Graph, float]:
-    """Строит граф товаров из датасета.
+    """Строит граф: вершины = df[source_field], рёбра = общие df[target_field].
 
     Параметры:
-        df            — DataFrame с колонками user_id, product_id
-        min_purchases — минимальное число покупок товара, чтобы попасть в граф
+        df            — DataFrame
+        source_field  — колонка-вершина (например, product_id)
+        target_field  — колонка-группа (например, user_id)
+        min_purchases — минимум записей source, чтобы попасть в граф
 
     Возвращает:
         (graph, build_ms)
@@ -35,33 +40,33 @@ def build_product_graph(
 
     start = perf_counter()
 
-    # 1. отфильтровать товары с >= min_purchases покупок
+    # 1. отфильтровать source с >= min_purchases
     if min_purchases > 1:
-        counts = df["product_id"].value_counts()
+        counts = df[source_field].value_counts()
         keep = set(counts[counts >= min_purchases].index)
-        df = df[df["product_id"].isin(keep)]
+        df = df[df[source_field].isin(keep)]
 
-    # 2. user_id -> set(product_id)
-    user_products = df.groupby("user_id")["product_id"].apply(set)
+    # 2. target -> set(source)
+    target_sources = df.groupby(target_field)[source_field].apply(set)
 
-    # 3. для каждой пары товаров одного пользователя — +1 к паре
-    pair_counts: dict[tuple[int, int], int] = {}
-    for products in user_products:
-        if len(products) < 2:
+    # 3. для каждой пары source одного target — +1 к паре
+    pair_counts: dict[tuple, int] = {}
+    for sources in target_sources:
+        if len(sources) < 2:
             continue
-        for p1, p2 in combinations(sorted(products), 2):
-            pair_counts[(p1, p2)] = pair_counts.get((p1, p2), 0) + 1
+        for s1, s2 in combinations(sorted(sources), 2):
+            pair_counts[(s1, s2)] = pair_counts.get((s1, s2), 0) + 1
 
     # 4. строим граф
     graph = Graph()
-    for (p1, p2), count in pair_counts.items():
+    for (s1, s2), count in pair_counts.items():
         if GRAPH_WEIGHT_MODE == "inverse":
-            # расстояние: чем больше общих покупателей, тем ближе
+            # расстояние: чем больше общих target, тем ближе
             weight = 1.0 / count
         else:
-            # «вес = общие покупатели» (Дейкстра будет искать далёкие — не рекомендуется)
+            # «вес = общие target» (Дейкстра будет искать далёкие — не рекомендуется)
             weight = float(count)
-        graph.add_edge(p1, p2, weight)
+        graph.add_edge(s1, s2, weight)
 
     elapsed_ms = (perf_counter() - start) * 1000.0
 
@@ -130,7 +135,12 @@ def load_graph_cache(path=GRAPH_CACHE_PATH) -> Graph | None:
         return None
 
 
-def build_or_load_product_graph(df, min_purchases=GRAPH_MIN_PURCHASES):
+def build_or_load_product_graph(
+    df,
+    source_field: str,
+    target_field: str,
+    min_purchases=GRAPH_MIN_PURCHASES,
+):
     """Загрузить граф из кэша или построить и сохранить.
 
     Возвращает (graph, build_ms, from_cache).
@@ -141,7 +151,9 @@ def build_or_load_product_graph(df, min_purchases=GRAPH_MIN_PURCHASES):
 
         return cached, 0.0, True
 
-    graph, ms = build_product_graph(df, min_purchases=min_purchases)
+    graph, ms = build_product_graph(
+        df, source_field, target_field, min_purchases=min_purchases,
+    )
     save_graph_cache(graph)
 
     return graph, ms, False

@@ -3,21 +3,28 @@
 from __future__ import annotations
 from time import perf_counter
 import pandas as pd
-from config import HASH_INITIAL_CAPACITY, UNIQUE_FIELD
+from config import HASH_INITIAL_CAPACITY
 from core.hash_map import HashMap
 from core.naive import linear_search
 
 
-def build_hash_index(keys: list[int]) -> tuple[HashMap, float]:
-    """Строит HashMap: key=order_id → value=row_id.
+def build_hash_index(
+    df: pd.DataFrame,
+    unique_field: str,
+) -> tuple[HashMap, float]:
+    """Построить HashMap: key = df[unique_field], value = row_id.
 
     Возвращает (index, время_построения_мс).
     """
 
+    keys = df[unique_field].tolist()
+
     index = HashMap(capacity=HASH_INITIAL_CAPACITY)
     start = perf_counter()
+
     for row_id, key in enumerate(keys):
         index.put(key, row_id)
+
     elapsed_ms = (perf_counter() - start) * 1000.0
 
     return index, elapsed_ms
