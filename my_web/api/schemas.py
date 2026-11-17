@@ -188,3 +188,15 @@ class BuildStatusResponse(BaseModel):
 class ResetResponse(BaseModel):
     status: str
     rows: int
+
+
+# ---------- bootstrap ----------
+
+class BootstrapResponse(BaseModel):
+    units: int
+    observed_median: float
+    mean: float
+    ci_low: float
+    ci_high: float
+    repeats: int
+    elapsed_ms: float

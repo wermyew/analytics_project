@@ -4,7 +4,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from api import dataset_api, hash_api, segment_api, graph_api
+from api import dataset_api, hash_api, segment_api, graph_api, bootstrap_api
 from config import (
     BASE_DIR,
     DATA_PATH,
@@ -12,7 +12,14 @@ from config import (
     UPLOADS_DIR,
 )
 from core.dataset_loader import load_dataset
-from pages import hash_pages, main_pages, segment_pages, upload_pages, graph_pages
+from pages import (
+    hash_pages,
+    main_pages,
+    segment_pages,
+    upload_pages,
+    graph_pages,
+    bootstrap_pages,
+)
 from services import graph_service, hash_service, segment_service
 from services.state import state
 
@@ -71,6 +78,7 @@ app.include_router(dataset_api.router)
 app.include_router(hash_api.router)
 app.include_router(segment_api.router)
 app.include_router(graph_api.router)
+app.include_router(bootstrap_api.router)
 
 # HTML
 app.include_router(main_pages.router)
@@ -78,3 +86,4 @@ app.include_router(hash_pages.router)
 app.include_router(segment_pages.router)
 app.include_router(upload_pages.router)
 app.include_router(graph_pages.router)
+app.include_router(bootstrap_pages.router)

@@ -28,13 +28,15 @@ ds_learning_site/
 │ ├── segment_service.py
 │ ├── graph_service.py
 │ ├── benchmark_service.py
-│ └── upload_validator.py
+│ ├── upload_validator.py
+│ └── bootstrap_service.py
 │
 ├── api/
 │ ├── hash_api.py
 │ ├── segment_api.py
 │ ├── dataset_api.py
 │ ├── graph_api.py
+│ ├── bootstrap_api.py
 │ └── schemas.py
 │
 ├── pages/
@@ -43,6 +45,7 @@ ds_learning_site/
 │ ├── segment_pages.py
 │ ├── graph_pages.py
 │ ├── upload_pages.py
+│ ├── bootstrap_pages.py
 │ └── templates.py
 │
 ├── templates/
@@ -51,6 +54,7 @@ ds_learning_site/
 │ ├── about.html
 │ ├── compare.html
 │ ├── upload.html
+│ ├── bootstrap.html
 │ ├── hash/
 │ │ ├── theory.html
 │ │ ├── demo.html
@@ -70,7 +74,8 @@ ds_learning_site/
 │ ├── hash_demo.js
 │ ├── segment_demo.js
 │ ├── graph_demo.js
-│ └── upload.js
+│ ├── upload.js
+│ └── bootstrap.js
 │
 └── tests/
 ├── conftest.py
@@ -78,6 +83,7 @@ ds_learning_site/
 ├── test_segment_tree.py
 ├── test_graph.py
 ├── test_heap.py
+├── test_bootstrap.py
 ├── test_api.py
 ├── test_api_graph.py
 ├── test_api_upload.py
